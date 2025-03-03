@@ -3,12 +3,12 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
 const firebaseConfig = {
-    apiKey: "AIzaSyDW6A25vqoWuxJpm5mpArTC5CutecKEk4A",
-    authDomain: "carpooling-e337a.firebaseapp.com",
-    projectId: "carpooling-e337a",
-    storageBucket: "carpooling-e337a.firebasestorage.app",
-    messagingSenderId: "708715504337",
-    appId: "1:708715504337:web:8876d8ba056b89df941bf0"
+    apiKey:  process.env.NEXT_PUBLIC__API_KEY,
+    authDomain: " process.env.NEXT_PUBLIC__AUTH_DOMAIN",
+    projectId: " process.env.NEXT_PUBLIC__PROJECT_ID",
+    storageBucket: " process.env.NEXT_PUBLIC__STORAGE_BUCKET",
+    messagingSenderId: " process.env.NEXT_PUBLIC__MESSAGING_SENDER_ID",
+    appId: " process.env.NEXT_PUBLIC__APP_ID"
   };
 
 // Initialize Firebase
