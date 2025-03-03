@@ -2,7 +2,7 @@ node_modules/
 .env
 
 # Ignore Firebase credentials
-serviceAccountKey.json
+server/serviceAccountKey.json
 
 
 
