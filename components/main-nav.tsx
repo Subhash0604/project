@@ -10,15 +10,15 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
-import { Car, User } from 'lucide-react';
+import { CarFront, User } from 'lucide-react';
 
 export function MainNav() {
   return (
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
-          <Car className="h-6 w-6" />
-          <span className="font-bold text-xl">RideShare</span>
+          <CarFront className="h-6 w-6" />
+          <span className="font-bold text-xl">HopNGo</span>
         </Link>
 
         <NavigationMenu>
@@ -43,7 +43,7 @@ export function MainNav() {
                   <li>
                     <NavigationMenuLink asChild>
                       <Link
-                        href="/offer-ride"
+                        href="/rides"
                         className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                       >
                         <div className="text-sm font-medium leading-none">Offer a Ride</div>
