@@ -1,11 +1,31 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { auth } from '@/app/firebase';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar, MapPin, Clock, Users, Car, ChevronRight } from 'lucide-react';
 
 export default function DashboardPage() {
+  const [user, setUser] = useState<any>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUser(user);
+      } else {
+        router.push('/login');
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router]);
+
+  if (!user) return null;
+
   const upcomingRides = [
     {
       id: 1,
@@ -30,7 +50,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-muted p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <h1 className="text-3xl font-bold">Welcome back, John</h1>
+        <h1 className="text-3xl font-bold">Welcome back, {user.displayName}</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>
