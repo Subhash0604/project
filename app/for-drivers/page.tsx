@@ -48,7 +48,7 @@ const Drivers = () => {
       <div className="relative max-w-6xl mx-auto text-center">
         <h2 className="text-4xl font-extrabold mb-12">How It Works for Drivers</h2>
         <p className="text-lg text-gray-300 mb-8">Become a trusted driver and earn money while sharing your journey with passengers. Our platform makes it easy to connect with riders and ensure a smooth experience.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
           {steps.map((step, index) => (
             <motion.div
               key={index}

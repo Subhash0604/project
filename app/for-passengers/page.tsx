@@ -3,7 +3,7 @@
 import { Car, MapPin, CreditCard, ThumbsUp, Clock, ShieldCheck, Star } from "lucide-react";
 import { motion } from "framer-motion";
 
-const Drivers = () => {
+const Passengers = () => {
   const steps = [
     {
       icon: <MapPin className="w-12 h-12 text-blue-600" />,
@@ -48,7 +48,7 @@ const Drivers = () => {
       <div className="relative max-w-6xl mx-auto text-center">
         <h2 className="text-4xl font-extrabold mb-12">How It Works for Passengers</h2>
         <p className="text-lg text-gray-300 mb-8">Our ride-sharing platform is designed to make traveling easy, efficient, and affordable. Follow these simple steps to book your next ride effortlessly.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
           {steps.map((step, index) => (
             <motion.div
               key={index}
@@ -70,4 +70,4 @@ const Drivers = () => {
   );
 }
 
-export default Drivers;
+export default Passengers;
