@@ -4,18 +4,83 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="11ef51fc-9a49-4147-ac44-b88a6c841ea7" name="Changes" comment="responsive_done">
-      <change beforePath="$PROJECT_DIR$/.eslintrc.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/hooks/use-toast.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/utils.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/next.config.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/postcss.config.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tailwind.config.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" />
+    <list default="true" id="11ef51fc-9a49-4147-ac44-b88a6c841ea7" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/.eslintrc.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/.idea/project.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/app/dashboard/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/app/for-drivers/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/app/for-passengers/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/app/globals.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/app/layout.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/app/login/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/app/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/app/rides/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/app/signup/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/main-nav.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/theme-provider.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/accordion.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/alert-dialog.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/alert.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/aspect-ratio.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/avatar.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/badge.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/breadcrumb.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/button.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/calendar.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/card.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/carousel.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/chart.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/checkbox.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/collapsible.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/command.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/context-menu.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/dialog.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/drawer.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/dropdown-menu.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/form.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/hover-card.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/input-otp.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/input.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/label.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/menubar.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/navigation-menu.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/pagination.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/popover.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/progress.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/radio-group.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/resizable.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/scroll-area.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/select.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/separator.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/sheet.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/skeleton.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/slider.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/sonner.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/switch.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/table.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/tabs.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/textarea.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/toast.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/toaster.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/toggle-group.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/toggle.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/components/ui/tooltip.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/hooks/use-toast.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/lib/utils.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/next.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/firebase.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/firebase.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/server.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,22 +110,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;jhaneswar&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/mani jhaneswar/Desktop/Amazon-project-JS/Amazon-Project/demogithub&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.fileTypes&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\mani jhaneswar\\Desktop\\project\\node_modules\\typescript\\lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "jhaneswar",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/Users/mani jhaneswar/Desktop/Amazon-project-JS/Amazon-Project/demogithub",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.fileTypes",
+    "ts.external.directory.path": "C:\\Users\\mani jhaneswar\\Desktop\\project\\Frontend\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -81,6 +146,7 @@
       <workItem from="1742202668835" duration="80000" />
       <workItem from="1742203650772" duration="1564000" />
       <workItem from="1742875603238" duration="711000" />
+      <workItem from="1742876421864" duration="3404000" />
     </task>
     <task id="LOCAL-00001" summary="passengers_comp_Done">
       <option name="closed" value="true" />
@@ -106,7 +172,23 @@
       <option name="project" value="LOCAL" />
       <updated>1742201787639</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="backend_fixed">
+      <option name="closed" value="true" />
+      <created>1742876560451</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1742876560451</updated>
+    </task>
+    <task id="LOCAL-00005" summary="prudhvi_server_added">
+      <option name="closed" value="true" />
+      <created>1742876632759</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1742876632759</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -127,6 +209,8 @@
     <MESSAGE value="passengers_comp_Done" />
     <MESSAGE value="drivers_comp_Done" />
     <MESSAGE value="responsive_done" />
-    <option name="LAST_COMMIT_MESSAGE" value="responsive_done" />
+    <MESSAGE value="backend_fixed" />
+    <MESSAGE value="prudhvi_server_added" />
+    <option name="LAST_COMMIT_MESSAGE" value="prudhvi_server_added" />
   </component>
 </project>

@@ -10,15 +10,44 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
-import { CarFront, User } from 'lucide-react';
+import { Car, User, LogOut } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { auth } from '@/app/firebase';
+import { signOut } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
+
+import useAuthStore from '@/store/useAuthStore';
 
 export function MainNav() {
+
+  const router = useRouter();
+
+ 
+    // const unsubscribe = auth.onAuthStateChanged((user) => {
+    //   setUser(user);
+    // });
+
+    const {user} = useAuthStore();
+
+
+    // return () => unsubscribe();
+  
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.push('/');
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
-          <CarFront className="h-6 w-6" />
-          <span className="font-bold text-xl">HopNGo</span>
+          <Car className="h-6 w-6" />
+          <span className="font-bold text-xl">RideShare</span>
         </Link>
 
         <NavigationMenu>
@@ -43,7 +72,7 @@ export function MainNav() {
                   <li>
                     <NavigationMenuLink asChild>
                       <Link
-                        href="/rides"
+                        href="/offer-rides"
                         className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                       >
                         <div className="text-sm font-medium leading-none">Offer a Ride</div>
@@ -93,15 +122,32 @@ export function MainNav() {
         </NavigationMenu>
 
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/login">
-              <User className="h-5 w-5 mr-2" />
-              Login
-            </Link>
-          </Button>
-          <Button size="sm" asChild>
-            <Link href="/signup">Sign Up</Link>
-          </Button>
+          {user ? (
+            <div className="flex items-center space-x-4">
+              <span className="text-sm">Hello, {user.displayName}</span>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleLogout}
+                className="flex items-center"
+              >
+                <LogOut className="h-5 w-5 mr-2" />
+                Logout
+              </Button>
+            </div>
+          ) : (
+            <>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/login">
+                  <User className="h-5 w-5 mr-2" />
+                  Login
+                </Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link href="/signup">Sign Up</Link>
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </header>
