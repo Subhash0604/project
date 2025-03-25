@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { Button } from '../components/ui/button';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -9,14 +9,14 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from '@/components/ui/navigation-menu';
+} from '../components/ui/navigation-menu';
 import { Car, User, LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { auth } from '@/app/firebase';
+import { auth } from '../app/firebase';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 
-import useAuthStore from '@/store/useAuthStore';
+import useAuthStore from '../store/useAuthStore';
 
 export function MainNav() {
 

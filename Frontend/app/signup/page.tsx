@@ -1,15 +1,15 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "../../components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "../../components/ui/card";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
 import { auth, googleProvider } from "../firebase";
 import { Car } from "lucide-react";
 import { useState } from "react";
@@ -19,8 +19,8 @@ import {
   createUserWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
-import useAuthStore from "@/store/useAuthStore";
-import { Separator } from "@/components/ui/separator";
+import useAuthStore from "../../store/useAuthStore";
+import { Separator } from "../../components/ui/separator";
 import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
