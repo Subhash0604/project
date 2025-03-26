@@ -52,7 +52,7 @@ export const offerRide = async (req, res) => {
     res.status(201).json({ success: true, message: "Ride created successfully", ride: newRide });
 
   } catch (error) {
-    console.error("❌ Backend Error:", error);
+    console.error("Backend Error:", error);
     res.status(500).json({ success: false, error: "Server Side Error" });
   }
 };
@@ -78,7 +78,7 @@ export const getRidesByMe = async (req, res) => {
 
 export const searchRides = async (req, res) => {
   try {
-    console.log("🔍 Received Query:", req.query);
+    console.log("Received Query:", req.query);
 
     let { from, to, date } = req.query;
 
@@ -102,7 +102,7 @@ export const searchRides = async (req, res) => {
 
     return res.json({ success: true, rides });
   } catch (error) {
-    console.error("❌ Search error:", error);
+    console.error("Search error:", error);
     return res.status(500).json({ success: false, error: "Server error" });
   }
 };
@@ -115,32 +115,32 @@ export const bookARide = async (req, res) => {
     const { rideId } = req.params;
     const { seats } = req.body;
 
-    console.log("📌 User ID:", uid);
-    console.log("📌 Ride ID:", rideId);
-    console.log("📌 Seats requested:", seats);
+    console.log("User ID:", uid);
+    console.log("Ride ID:", rideId);
+    console.log("Seats requested:", seats);
 
     // Check if user exists
     const user = await userModel.findOne({ uid });
     if (!user) {
-      console.log("❌ User not found");
+      console.log("User not found");
       return res.status(401).json({ success: false, error: "Login to book a ride" });
     }
 
     // Find the ride
     const ride = await rideModel.findById(rideId);
     if (!ride) {
-      console.log("❌ Ride not found");
+      console.log("Ride not found");
       return res.status(404).json({ success: false, error: "Ride not found" });
     }
 
     if (ride.status !== "available") {
-      console.log("❌ Ride is not available");
+      console.log("Ride is not available");
       return res.status(400).json({ success: false, error: "Ride is not available" });
     }
 
     // ❗ Check if enough seats are available
     if (ride.availableSeats < seats) {
-      console.log("❌ Not enough seats available");
+      console.log("Not enough seats available");
       return res.status(400).json({ success: false, error: "Not enough seats available" });
     }
 
@@ -158,14 +158,14 @@ export const bookARide = async (req, res) => {
     }
     await ride.save();
 
-    console.log("✅ Ride booked successfully");
+    console.log("Ride booked successfully");
     return res.status(200).json({
       success: true,
       message: "Ride booked successfully",
       booking: newBooking,
     });
   } catch (error) {
-    console.error("🔥 Server Error:", error);
+    console.error("Server Error:", error);
     return res.status(500).json({ success: false, error: "Server Side Error" });
   }
 };
