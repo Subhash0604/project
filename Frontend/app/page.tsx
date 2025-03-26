@@ -86,10 +86,10 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="secondary" size="lg" asChild>
-              <Link href="/offer-ride">Offer a Ride</Link>
+              <Link href="/offer-rides">Offer a Ride</Link>
             </Button>
             <Button variant="secondary" size="lg" asChild>
-              <Link href="/find-ride">Find a Ride</Link>
+              <Link href="/rides">Find a Ride</Link>
             </Button>
           </div>
         </div>

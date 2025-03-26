@@ -80,8 +80,8 @@ export default function DashboardPage() {
               <MapPin className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">1,204 km</div>
-              <p className="text-xs text-muted-foreground">+123 km from last month</p>
+              <div className="text-2xl font-bold">0 km</div>
+              <p className="text-xs text-muted-foreground">+0 km from last month</p>
             </CardContent>
           </Card>
           <Card>
@@ -90,8 +90,8 @@ export default function DashboardPage() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">342 kg</div>
-              <p className="text-xs text-muted-foreground">+42 kg from last month</p>
+              <div className="text-2xl font-bold">0 kg</div>
+              <p className="text-xs text-muted-foreground">+0 kg from last month</p>
             </CardContent>
           </Card>
         </div>

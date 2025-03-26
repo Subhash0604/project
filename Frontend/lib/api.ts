@@ -84,7 +84,7 @@ export const searchRides = async ({
   }
 };
 
-// 🏁 Book a ride
+// Book a ride
 export const bookARide = async (rideId: string, seats: number) => {
   const token = await getAuthToken(); // Get Firebase token
   if (!token) throw new Error("User not authenticated");
