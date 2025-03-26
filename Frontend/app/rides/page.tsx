@@ -1,172 +1,147 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import { MapPin, Calendar, Clock, Users, Car, Filter } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Button } from '../../components/ui/button';
+import { Card, CardContent } from '../../components/ui/card';
+import { Input } from '../../components/ui/input';
+import { MapPin, Calendar, Users, Car, Filter } from 'lucide-react';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '../../components/ui/select';
+import { searchRides, bookARide } from '../../lib/api';
 
 export default function RidesPage() {
-  const rides = [
-    {
-      id: 1,
-      driver: 'Sarah Johnson',
-      from: 'San Francisco',
-      to: 'Los Angeles',
-      date: '2025-04-15',
-      time: '09:00 AM',
-      seats: 3,
-      price: 45,
-      car: 'Tesla Model 3',
-      rating: 4.8,
-    },
-    {
-      id: 2,
-      driver: 'Michael Chen',
-      from: 'Los Angeles',
-      to: 'San Diego',
-      date: '2025-04-15',
-      time: '10:30 AM',
-      seats: 2,
-      price: 30,
-      car: 'Toyota Prius',
-      rating: 4.9,
-    },
-  ];
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const [date, setDate] = useState('');
+  const [availableSeats, setAvailableSeats] = useState<number | null>(null);
+  const [rides, setRides] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [bookingRideId, setBookingRideId] = useState<string | null>(null);
+
+  // Fetch rides based on search
+  const handleSearch = async () => {
+    setLoading(true);
+    try {
+      const response = await searchRides({ from, to, date, availableSeats });
+      console.log("🚗 Search Response:", response);
+
+      if (response.success && Array.isArray(response.rides)) {
+        setRides(response.rides);
+      } else {
+        setRides([]);
+      }
+    } catch (error) {
+      console.error("Error fetching rides:", error);
+      setRides([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle booking a ride
+  const handleBookRide = async (rideId: string) => {
+    if (!availableSeats || availableSeats < 1) {
+      alert("Please select a valid number of passengers.");
+      return;
+    }
+
+    setBookingRideId(rideId);
+    try {
+      const response = await bookARide(rideId, availableSeats);
+      alert("Ride booked successfully!");
+      handleSearch();
+    } catch (error) {
+      console.error("Error booking ride:", error);
+      alert(error.response?.data?.error || "Failed to book ride. Try again.");
+    } finally {
+      setBookingRideId(null);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-muted">
-      {/* Search Header */}
-      <div className="bg-background border-b">
-        <div className="max-w-7xl mx-auto p-6">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div className="relative">
-              <MapPin className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-              <Input placeholder="From" className="pl-10" />
-            </div>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-              <Input placeholder="To" className="pl-10" />
-            </div>
-            <div className="relative">
-              <Calendar className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-              <Input type="date" className="pl-10" />
-            </div>
-            <div className="relative">
-              <Users className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-              <Select>
-                <SelectTrigger className="pl-10">
-                  <SelectValue placeholder="Passengers" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">1 Passenger</SelectItem>
-                  <SelectItem value="2">2 Passengers</SelectItem>
-                  <SelectItem value="3">3 Passengers</SelectItem>
-                  <SelectItem value="4">4 Passengers</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <Button className="w-full">Search</Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Filters */}
-          <Card className="lg:col-span-1 h-fit">
-            <CardContent className="p-6 space-y-6">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold">Filters</h3>
-                <Filter className="h-4 w-4 text-muted-foreground" />
+      <div className="min-h-screen bg-muted">
+        {/* Search Header */}
+        <div className="bg-background border-b">
+          <div className="max-w-7xl mx-auto p-6">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div className="relative">
+                <MapPin className="absolute left-3 top-3 h-5 w-5 text-muted-foreground"/>
+                <Input value={from} onChange={(e) => setFrom(e.target.value)} placeholder="From" className="pl-10"/>
               </div>
-              
-              <div className="space-y-2">
-                <Label>Price Range</Label>
-                <Slider defaultValue={[50]} max={100} step={1} />
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>$0</span>
-                  <span>$100</span>
-                </div>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-3 h-5 w-5 text-muted-foreground"/>
+                <Input value={to} onChange={(e) => setTo(e.target.value)} placeholder="To" className="pl-10"/>
               </div>
-
-              <div className="space-y-2">
-                <Label>Departure Time</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Any Time" />
+              <div className="relative">
+                <Calendar className="absolute left-3 top-3 h-5 w-5 text-muted-foreground"/>
+                <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="pl-10"/>
+              </div>
+              <div className="relative">
+                <Users className="absolute left-3 top-3 h-5 w-5 text-muted-foreground"/>
+                <Select onValueChange={(value) => setAvailableSeats(Number(value))}>
+                  <SelectTrigger className="pl-10">
+                    <SelectValue placeholder="Passengers"/>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="morning">Morning</SelectItem>
-                    <SelectItem value="afternoon">Afternoon</SelectItem>
-                    <SelectItem value="evening">Evening</SelectItem>
+                    <SelectItem value="1">1 Passenger</SelectItem>
+                    <SelectItem value="2">2 Passengers</SelectItem>
+                    <SelectItem value="3">3 Passengers</SelectItem>
+                    <SelectItem value="4">4 Passengers</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-
-              <Button variant="outline" className="w-full">Reset Filters</Button>
-            </CardContent>
-          </Card>
-
-          {/* Rides List */}
-          <div className="lg:col-span-3 space-y-4">
-            {rides.map((ride) => (
-              <Card key={ride.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex flex-col md:flex-row justify-between space-y-4 md:space-y-0">
-                    <div className="space-y-4">
-                      <div className="flex items-center space-x-4">
-                        <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Car className="h-6 w-6" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold">{ride.driver}</h3>
-                          <p className="text-sm text-muted-foreground">{ride.car}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <div className="flex items-center space-x-2">
-                          <MapPin className="h-4 w-4 text-muted-foreground" />
-                          <span>{ride.from} → {ride.to}</span>
-                        </div>
-                        <div className="flex space-x-4 text-sm text-muted-foreground">
-                          <div className="flex items-center">
-                            <Calendar className="mr-1 h-4 w-4" />
-                            {ride.date}
-                          </div>
-                          <div className="flex items-center">
-                            <Clock className="mr-1 h-4 w-4" />
-                            {ride.time}
-                          </div>
-                          <div className="flex items-center">
-                            <Users className="mr-1 h-4 w-4" />
-                            {ride.seats} seats available
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col md:items-end justify-between">
-                      <div className="text-2xl font-bold">${ride.price}</div>
-                      <Button>Book Now</Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+              <Button className="w-full" onClick={handleSearch} disabled={loading}>
+                {loading ? "Searching..." : "Search"}
+              </Button>
+            </div>
           </div>
         </div>
+
+        {/* Main Content */}
+        <div className="max-w-7xl mx-auto p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Rides List */}
+            <div className="lg:col-span-3 space-y-6">
+              {rides.length === 0 ? (
+                  <p className="text-gray-500 text-center text-lg">No rides found.</p>
+              ) : (
+                  rides.map((ride) => (
+                      <Card key={ride._id} className="shadow-md border rounded-lg hover:shadow-lg transition">
+                        <CardContent className="p-6 space-y-2">
+                          <h3 className="text-xl font-semibold text-gray-50">
+                            {ride?.from} → {ride?.to}
+                          </h3>
+                          <p className="text-gray-300">📅 Date: <span className="font-medium">{ride?.date}</span> | ⏰
+                            Time: <span className="font-medium">{ride?.time}</span></p>
+                          <p className="text-gray-300">🪑 Seats Available: <span
+                              className="font-medium">{ride?.availableSeats}</span></p>
+                          <p className="text-gray-300">💰 Price per Seat: <span
+                              className="font-medium">${ride?.pricePerSeat}</span></p>
+                          <p className="text-gray-300">🚗 Car: <span
+                              className="font-medium">{ride?.carDetails?.make} {ride?.carDetails?.model}</span></p>
+                          <p className={`text-sm font-medium ${ride?.status === 'available' ? 'text-green-300' : 'text-red-300'}`}>
+                            🔄 Status: {ride?.status}
+                          </p>
+                          <Button
+                              onClick={() => handleBookRide(ride._id)}
+                              disabled={bookingRideId === ride._id}
+                              className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition"
+                          >
+                            {bookingRideId === ride._id ? "Booking..." : "Book Ride"}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                  ))
+              )}
+            </div>
+          </div>
+        </div>
+
       </div>
-    </div>
   );
 }
