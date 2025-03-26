@@ -1,15 +1,17 @@
 'use client';
 
+import { auth } from '../firebase';
+import { getRidesByMe } from "../../lib/api";
 import { useEffect, useState } from 'react';
-import { auth } from '@/app/firebase';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, MapPin, Clock, Users, Car, ChevronRight } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { MapPin, Users, Car } from 'lucide-react';
 
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
+  const [ridesByMe, setRidesByMe] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -20,38 +22,47 @@ export default function DashboardPage() {
         router.push('/login');
       }
     });
-
     return () => unsubscribe();
   }, [router]);
 
-  if (!user) return null;
+  useEffect(() => {
+    if (!user) return;
 
-  const upcomingRides = [
-    {
-      id: 1,
-      from: 'San Francisco',
-      to: 'Los Angeles',
-      date: '2025-04-15',
-      time: '09:00 AM',
-      passengers: 2,
-      price: 45,
-    },
-    {
-      id: 2,
-      from: 'Los Angeles',
-      to: 'San Diego',
-      date: '2025-04-18',
-      time: '10:30 AM',
-      passengers: 1,
-      price: 30,
-    },
-  ];
+    const fetchRidesByMe = async () => {
+      try {
+        setLoading(true);
+        const response = await getRidesByMe();
+
+        if (response.success && Array.isArray(response.rides)) {
+          const uniqueRides = Array.from(new Map(response.rides.map(ride => [ride._id, ride])).values());
+          setRidesByMe(uniqueRides);
+        } else {
+          setRidesByMe([]);
+        }
+      } catch (error) {
+        console.error("Error fetching rides:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRidesByMe();
+  }, [user]);
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Loading user...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         <h1 className="text-3xl font-bold">Welcome back, {user.displayName}</h1>
-        
+
+        {/* Dashboard Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -59,8 +70,8 @@ export default function DashboardPage() {
               <Car className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">28</div>
-              <p className="text-xs text-muted-foreground">+2 from last month</p>
+              <div className="text-2xl font-bold">{ridesByMe.length}</div>
+              <p className="text-xs text-muted-foreground">from beginning</p>
             </CardContent>
           </Card>
           <Card>
@@ -85,48 +96,56 @@ export default function DashboardPage() {
           </Card>
         </div>
 
+        {/* Tabs for Rides */}
         <Tabs defaultValue="upcoming" className="space-y-4">
           <TabsList>
-            <TabsTrigger value="upcoming">Upcoming Rides</TabsTrigger>
-            <TabsTrigger value="past">Past Rides</TabsTrigger>
-            <TabsTrigger value="offered">Offered Rides</TabsTrigger>
+            <TabsTrigger value="past">Rides By Me</TabsTrigger>
+            <TabsTrigger value="upcoming">Bookings By Me</TabsTrigger>
           </TabsList>
-          <TabsContent value="upcoming" className="space-y-4">
-            {upcomingRides.map((ride) => (
-              <Card key={ride.id}>
-                <CardContent className="flex items-center justify-between p-6">
-                  <div className="flex items-center space-x-4">
-                    <div className="space-y-1">
-                      <div className="flex items-center space-x-2">
-                        <MapPin className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium">{ride.from} → {ride.to}</span>
-                      </div>
-                      <div className="flex space-x-4 text-sm text-muted-foreground">
-                        <div className="flex items-center">
-                          <Calendar className="mr-1 h-4 w-4" />
-                          {ride.date}
-                        </div>
-                        <div className="flex items-center">
-                          <Clock className="mr-1 h-4 w-4" />
-                          {ride.time}
-                        </div>
-                        <div className="flex items-center">
-                          <Users className="mr-1 h-4 w-4" />
-                          {ride.passengers} passenger(s)
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="text-2xl font-bold">${ride.price}</div>
-                    <Button variant="ghost" size="icon">
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </TabsContent>
+
+          {/* Rides By Me */}
+            <TabsContent value="past" className="space-y-4">
+              {loading ? (
+                <p className="text-gray-300 text-center text-lg">Loading rides...</p>
+              ) : ridesByMe.length === 0 ? (
+                <p className="text-gray-500 text-center text-lg">No rides found.</p>
+              ) : (
+                ridesByMe.map((ride) => (
+                  <Card
+                    key={ride._id}
+                    className="p-4 bg-gray-800 border border-gray-700 rounded-lg shadow-md hover:shadow-lg transition"
+                  >
+                    <CardHeader>
+                      <CardTitle className="text-lg font-semibold text-white">
+                        {ride.from} ➝ {ride.to}
+                      </CardTitle>
+                      <CardDescription className="text-gray-400">
+                        📅 {ride.date} at ⏰ {ride.time}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="text-gray-300 space-y-2">
+                      <p>
+                        <strong className="text-gray-400">🪑 Seats:</strong> {ride.availableSeats}
+                      </p>
+                      <p>
+                        <strong className="text-gray-400">💰 Price:</strong> ₹{ride.pricePerSeat}
+                      </p>
+                      <p>
+                        <strong className="text-gray-400">🚗 Car:</strong>{" "}
+                        {ride.carDetails?.make} {ride.carDetails?.model} ({ride.carDetails?.color})
+                      </p>
+                      <p
+                        className={`font-semibold ${
+                          ride?.status === "available" ? "text-green-500" : "text-red-500"
+                        }`}
+                      >
+                        🔄 Status: {ride?.status}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </TabsContent>
         </Tabs>
       </div>
     </div>
