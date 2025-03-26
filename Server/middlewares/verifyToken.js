@@ -11,8 +11,6 @@ export const verifyToken = async (req, res, next) => {
 
   const idToken = authHeader.split(" ")[1];
 
-  console.log(idToken);
-
   try {
     const decodedToken = await admin.auth().verifyIdToken(idToken);
 

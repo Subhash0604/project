@@ -11,7 +11,6 @@ import {
   NavigationMenuTrigger,
 } from '../components/ui/navigation-menu';
 import { Car, User, LogOut } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { auth } from '../app/firebase';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
@@ -62,7 +61,7 @@ export function MainNav() {
                         href="/rides"
                         className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                       >
-                        <div className="text-sm font-medium leading-none">Search Rides</div>
+                        <div className="text-sm font-medium leading-none">Book a Ride</div>
                         <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                           Find available rides that match your route and schedule
                         </p>
@@ -124,7 +123,7 @@ export function MainNav() {
         <div className="flex items-center space-x-4">
           {user ? (
             <div className="flex items-center space-x-4">
-              <span className="text-sm">Hello, {user.displayName}</span>
+              <span className="text-sm"><Link href='/dashboard'>Hello, {user.displayName}</Link></span>
               <Button 
                 variant="ghost" 
                 size="sm" 
