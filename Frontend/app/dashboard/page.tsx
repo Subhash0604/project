@@ -174,9 +174,9 @@ export default function DashboardPage() {
           {/* Booking by Me */}
           <TabsContent value="upcoming" className="space-y-4">
             {loading ? (
-              <p className="text-muted-foreground">Loading bookings...</p>
+              <p className="text-gray-500 text-center text-lg">Loading bookings...</p>
             ) : bookingsByMe.length === 0 ? (
-              <p className="text-muted-foreground">No bookings found.</p>
+              <p className="text-gray-500 text-center text-lg">No bookings found.</p>
             ) : (
               bookingsByMe.map((booking) => (
                 <Card key={booking._id} className="p-4 shadow-lg border border-gray-700 rounded-xl bg-gray-900 text-white">
