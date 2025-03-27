@@ -1,7 +1,7 @@
 'use client';
 
 import { auth } from '../firebase';
-import { getRidesByMe } from "../../lib/api";
+import { getRidesByMe, getBookingByMe } from "../../lib/api";
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
@@ -11,6 +11,7 @@ import { MapPin, Users, Car } from 'lucide-react';
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
   const [ridesByMe, setRidesByMe] = useState<any[]>([]);
+  const [bookingsByMe,setBookingsByMe] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
 
@@ -36,6 +37,7 @@ export default function DashboardPage() {
         if (response.success && Array.isArray(response.rides)) {
           const uniqueRides = Array.from(new Map(response.rides.map(ride => [ride._id, ride])).values());
           setRidesByMe(uniqueRides);
+          console.log("My rides :",uniqueRides);
         } else {
           setRidesByMe([]);
         }
@@ -47,6 +49,28 @@ export default function DashboardPage() {
     };
 
     fetchRidesByMe();
+  }, [user]);
+
+  useEffect(() => {
+    if(!user) return;
+    const fetchBookingsByMe = async () => {
+        try{
+        setLoading(true);
+        const response = await getBookingByMe();
+          console.log("my bookings :",response);
+        if (response.success) {
+          setBookingsByMe(response.bookings);
+        }else{
+          setBookingsByMe([]);
+        }
+      }catch (error){
+        console.error("error fetching bookings", error);
+      }finally {
+        setLoading(false);
+      }
+    }
+    fetchBookingsByMe();
+
   }, [user]);
 
   if (!user) {
@@ -146,6 +170,49 @@ export default function DashboardPage() {
                 ))
               )}
             </TabsContent>
+
+          {/* Booking by Me */}
+          <TabsContent value="upcoming" className="space-y-4">
+            {loading ? (
+              <p className="text-muted-foreground">Loading bookings...</p>
+            ) : bookingsByMe.length === 0 ? (
+              <p className="text-muted-foreground">No bookings found.</p>
+            ) : (
+              bookingsByMe.map((booking) => (
+                <Card key={booking._id} className="p-4 shadow-lg border border-gray-700 rounded-xl bg-gray-900 text-white">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold text-white">
+                      {booking.ride ? (
+                        <>
+                          {booking.ride.from} ➝ {booking.ride.to}
+                        </>
+                      ) : (
+                        "Ride details unavailable"
+                      )}
+                    </CardTitle>
+                    <CardDescription className="text-gray-400">
+                    {booking.ride ? `${booking.ride.date} at ${booking.ride.time}` : "N/A"}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <p>
+                      <strong className="text-slate-300">Seats Booked:</strong> {booking.seatsBooked}
+                    </p>
+                    <p>
+                      <strong className="text-slate-300">Price:</strong> ₹ {booking.ride ? booking.ride.pricePerSeat * booking.seatsBooked : "N/A"}
+                    </p>
+                    <p>
+                      <strong className="text-slate-300">Car:</strong>
+                      {booking.ride?.carDetails ? `${booking.ride.carDetails.make} ${booking.ride.carDetails.model} (${booking.ride.carDetails.color})` : "N/A"}
+                    </p>
+                    <p>
+                      <strong className="text-slate-300">Status:</strong> {booking.status}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </TabsContent>
         </Tabs>
       </div>
     </div>

@@ -1,16 +1,16 @@
 import axios from "axios";
-import { auth } from "../app/firebase"; // Firebase authentication
+import { auth } from "../app/firebase";
 
-// Correct Base URL
+// base url
 const API_BASE_URL = "http://localhost:8000";
 
-// Function to get Firebase Auth Token
+// firebase auth token
 const getAuthToken = async (): Promise<string | null> => {
   const user = auth.currentUser;
   return user ? await user.getIdToken() : null;
 };
 
-// Create an Axios instance
+// axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -18,7 +18,6 @@ const api = axios.create({
   },
 });
 
-// Axios Interceptor to attach the Bearer Token to every request
 api.interceptors.request.use(async (config) => {
   const token = await getAuthToken();
   if (token) {
@@ -27,7 +26,7 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
-// Offer a Ride
+// offer ride
 export const offerRide = async (rideData: any) => {
   try {
     const token = await getAuthToken();
@@ -43,7 +42,7 @@ export const offerRide = async (rideData: any) => {
   }
 };
 
-// Get Rides Offered by Me
+// rides by me
 export const getRidesByMe = async () => {
   try {
     const token = await getAuthToken();
@@ -51,7 +50,6 @@ export const getRidesByMe = async () => {
         {
           headers : {Authorization : `Bearer ${token}`},
         });
-    getRidesByMe().then((data) => console.log("Rides by me:", data));
 
     return response.data;
   } catch (error: any) {
@@ -60,7 +58,7 @@ export const getRidesByMe = async () => {
   }
 };
 
-// Search for rides
+// search for rides
 export const searchRides = async ({
   from,
   to,
@@ -84,14 +82,14 @@ export const searchRides = async ({
   }
 };
 
-// Book a ride
+// book ride
 export const bookARide = async (rideId: string, seats: number) => {
   const token = await getAuthToken(); // Get Firebase token
   if (!token) throw new Error("User not authenticated");
 
   try {
     const response = await api.post(
-      `/api/rides/bookARide/${rideId}`,  // Ensure this matches backend route
+      `/api/rides/bookARide/${rideId}`,
       { seats },
       {
         headers: {
@@ -106,12 +104,32 @@ export const bookARide = async (rideId: string, seats: number) => {
   }
 };
 
+// get Booking by me
+export const getBookingByMe = async (rideId: string) => {
+  const token = await getAuthToken();
+  if (!token) throw new Error("user not authenticated");
 
-// Cancel a Booking
+  try{
+    const response = await api.get(
+        `/api/rides/getBookingsByUser`,
+        {
+          headers:{
+          Authorization: `Bearer ${token}`,
+          },
+        }
+    )
+    return response.data;
+  }catch(error: any) {
+    console.error("fetching bookings failed:", error.response?.data);
+    throw error;
+  }
+};
+
+// cancel
 export const cancelBooking = async (bookingId: string) => {
   const token = await getAuthToken();
 
-  if (!token) throw new Error("User not authenticated");
+  if (!token) throw new Error("user not authenticated");
 
   try {
     const response = await api.post(
@@ -129,12 +147,12 @@ export const cancelBooking = async (bookingId: string) => {
     throw error;
   }
 };
-// Reject a Booking
+// reject booking
 export const rejectBooking = async (bookingId: string) => {
   return api.post(`/api/rides/rejectBooking/${bookingId}`);
 };
 
-// Accept a Booking
+// accept booking
 export const acceptBooking = async (bookingId: string) => {
   return api.post(`/api/rides/acceptBooking/${bookingId}`);
 };

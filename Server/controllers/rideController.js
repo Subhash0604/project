@@ -170,6 +170,23 @@ export const bookARide = async (req, res) => {
   }
 };
 
+export const getBookingsByUser = async (req, res) => {
+  try {
+    console.log(req);
+    const { uid } = req.user;
+    const user = await userModel.findOne({uid});
+    if(!user){
+      return res.status(401).json({status : false, error: "user not found"});
+    }
+
+    const bookings = await bookingModel.find({ passenger: user._id }).populate("ride");
+
+   return res.status(200).json({ success: true, bookings });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ success: false, error: "Server Side Error" });
+  }
+};
 
 export const cancelBooking = async (req, res) => {
   try {
