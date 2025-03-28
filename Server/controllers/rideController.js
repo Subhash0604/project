@@ -76,6 +76,14 @@ export const searchRides = async (req, res) => {
           availableSeats: { $gt: 0 },
         },
       },
+      {
+        $lookup: {
+          from: "users",
+          localField: "BookingUsers",
+          foreignField: "_id",
+          as: "Users",
+        },
+      },
     ]);
 
     return res.status(200).json({ success: true, rides });
@@ -112,6 +120,9 @@ export const bookARide = async (req, res) => {
         .status(400)
         .json({ success: false, error: "Requested ride is not available" });
     }
+
+    ride.BookingUsers.push(user._id);
+    ride.save();
 
     const newBooking = await bookingModel.create({
       ride: ride._id,

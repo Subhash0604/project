@@ -42,6 +42,12 @@ const rideSchema = new mongoose.Schema({
       },
     },
   ],
+  BookingUsers: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
   carDetails: {
     model: String,
     licensePlate: String,
