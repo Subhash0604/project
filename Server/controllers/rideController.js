@@ -5,8 +5,18 @@ import userModel from "../models/userModel.js";
 export const offerRide = async (req, res) => {
   try {
     const { uid } = req.user;
-    const { from, to, date, time, availableSeats, pricePerSeat, carDetails } =
-      req.body;
+
+    const {
+      from,
+      to,
+      date,
+      time,
+      availableSeats,
+      pricePerSeat,
+      carDetails,
+      fromCoordinates,
+      toCoordinates,
+    } = req.body;
 
     if (
       !from ||
@@ -17,23 +27,37 @@ export const offerRide = async (req, res) => {
       !pricePerSeat ||
       !carDetails?.model ||
       !carDetails?.licensePlate ||
-      !carDetails?.color
+      !carDetails?.color ||
+      !fromCoordinates ||
+      !toCoordinates ||
+      !Array.isArray(fromCoordinates) ||
+      !Array.isArray(toCoordinates) ||
+      fromCoordinates.length !== 2 ||
+      toCoordinates.length !== 2
     ) {
-      return res
-        .status(400)
-        .json({ success: false, error: "All fields are required" });
+      return res.status(400).json({
+        success: false,
+        error: "All fields including coordinates are required",
+      });
     }
 
     const driver = await userModel.findOne({ uid });
-
     if (!driver) {
-      return res.status(401).json({ success: false, error: "user not found" });
+      return res.status(401).json({ success: false, error: "User not found" });
     }
 
     await rideModel.create({
       driver: driver._id,
       from,
       to,
+      fromCoordinates: {
+        type: "Point",
+        coordinates: fromCoordinates,
+      },
+      toCoordinates: {
+        type: "Point",
+        coordinates: toCoordinates,
+      },
       date,
       time,
       availableSeats,
@@ -43,10 +67,9 @@ export const offerRide = async (req, res) => {
 
     res
       .status(201)
-      .json({ success: true, message: "ride created successfully" });
+      .json({ success: true, message: "Ride created successfully" });
   } catch (error) {
-    console.log(error);
-
+    console.error(error);
     res.status(500).json({ success: false, error: "Server Side Error" });
   }
 };
@@ -149,7 +172,9 @@ export const getRidesByMe = async (req, res) => {
       return res.status(404).json({ success: false, error: "user not found" });
     }
 
-    const rides = await rideModel.find({ driver: user._id });
+    const rides = await rideModel
+      .find({ driver: user._id })
+      .sort({ createdAt: -1 });
 
     return res.status(200).json({ success: true, rides });
   } catch (error) {
@@ -343,14 +368,13 @@ export const getBookings = async (req, res) => {
       return res.status(401).json({ success: false, error: "User not found" });
     }
 
-    console.log(ride.driver);
-    console.log(user._id);
-
     if (!ride.driver.equals(user._id)) {
       return res.status(403).json({ success: false, error: "UnAuthorized" });
     }
 
-    const bookings = await bookingModel.find({ ride: ride._id });
+    const bookings = await bookingModel
+      .find({ ride: ride._id })
+      .sort({ createdAt: -1 });
 
     return res.status(200).json({ success: true, bookings });
   } catch (error) {
@@ -370,6 +394,7 @@ export const getBookingsByUser = async (req, res) => {
 
     const bookings = await bookingModel
       .find({ passenger: user._id })
+      .sort({ createdAt: -1 })
       .populate("ride");
 
     return res.status(200).json({ success: true, bookings });
