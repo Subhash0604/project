@@ -1,7 +1,7 @@
 import axios from "axios";
 import { auth } from "../app/firebase";
 
-// base url
+
 const API_BASE_URL = "http://localhost:8000";
 
 // firebase auth token
@@ -27,7 +27,21 @@ api.interceptors.request.use(async (config) => {
 });
 
 // offer ride
-export const offerRide = async (rideData: any) => {
+export const offerRide = async (rideData: {
+  from: string;
+  to: string;
+  date: string;
+  time: string;
+  availableSeats: number;
+  pricePerSeat: number;
+  carDetails: {
+    model: string;
+    licensePlate: string;
+    color: string;
+  };
+  fromCoordinates: [number, number]; // [lng, lat]
+  toCoordinates: [number, number];   // [lng, lat]
+}) => {
   try {
     const token = await getAuthToken();
     const response = await api.post("/api/rides/offerRide", rideData, {
@@ -41,6 +55,7 @@ export const offerRide = async (rideData: any) => {
     throw error;
   }
 };
+
 
 // rides by me
 export const getRidesByMe = async () => {
