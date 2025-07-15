@@ -407,7 +407,7 @@ export const getBookingsByUser = async (req, res) => {
 export const getRide = async (req, res) => {
   try {
     const { rideId } = req.params;
-    // const { uid } = req.user;
+    const { uid } = req.user;
 
     const ride = await rideModel.findById(rideId);
 
@@ -415,11 +415,11 @@ export const getRide = async (req, res) => {
       return res.status(404).json({ success: false, error: "Ride not found" });
     }
 
-    // const user = await userModel.findOne({ uid });
+    const user = await userModel.findOne({ uid });
 
-    // if (!user) {
-    //   return res.status(401).json({ success: false, error: "User not found" });
-    // }
+    if (!user) {
+      return res.status(401).json({ success: false, error: "User not found" });
+    }
 
     return res.status(200).json({ success: true, ride });
   } catch (error) {
