@@ -24,6 +24,6 @@ router.post("/rejectBooking/:bookingId", verifyToken, rejectBooking);
 router.post("/acceptBooking/:bookingId", verifyToken, acceptBooking);
 router.get("/bookings/:rideId", verifyToken, getBookings);
 router.get("/getBookingsByUser", verifyToken, getBookingsByUser);
-router.get("/getRide/:rideId", getRide);
+router.get("/getRide/:rideId", verifyToken, getRide);
 
 export default router;
