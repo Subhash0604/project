@@ -2,24 +2,28 @@ import express from "express";
 import {
   acceptBooking,
   bookARide,
-  searchRides,
   cancelBooking,
+  getBookings,
   getRidesByMe,
   offerRide,
   rejectBooking,
   getBookingsByUser,
+  searchRides,
+  getRide,
 } from "../controllers/rideController.js";
 import { verifyToken } from "../middlewares/verifyToken.js";
 
 const router = express.Router();
 
-router.post("/offerRide", verifyToken, offerRide); // done
-router.get("/getRidesByMe", verifyToken, getRidesByMe); // done
-router.get("/searchRides", searchRides); // done
-router.post("/bookARide/:rideId", verifyToken, bookARide); // done
-router.get("/getBookingsByUser", verifyToken, getBookingsByUser); // working on it
-router.post("/cancelBooking/:bookingId", verifyToken, cancelBooking); //
+router.post("/offerRide", verifyToken, offerRide);
+router.get("/getRidesByMe", verifyToken, getRidesByMe);
+router.get("/searchRides", searchRides);
+router.post("/bookARide/:rideId", verifyToken, bookARide);
+router.post("/cancelBooking/:bookingId", verifyToken, cancelBooking);
 router.post("/rejectBooking/:bookingId", verifyToken, rejectBooking);
 router.post("/acceptBooking/:bookingId", verifyToken, acceptBooking);
+router.get("/bookings/:rideId", verifyToken, getBookings);
+router.get("/getBookingsByUser", verifyToken, getBookingsByUser);
+router.get("/getRide/:rideId", verifyToken, getRide);
 
 export default router;

@@ -10,9 +10,31 @@ const rideSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  fromCoordinates: {
+    type: {
+      type: String,
+      enum: ["Point"],
+      default: "Point",
+    },
+    coordinates: {
+      type: [Number], // [longitude, latitude]
+      required: true,
+    },
+  },
   to: {
     type: String,
     required: true,
+  },
+  toCoordinates: {
+    type: {
+      type: String,
+      enum: ["Point"],
+      default: "Point",
+    },
+    coordinates: {
+      type: [Number], // [longitude, latitude]
+      required: true,
+    },
   },
   date: {
     type: String,
@@ -42,6 +64,12 @@ const rideSchema = new mongoose.Schema({
       },
     },
   ],
+  BookingUsers: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
   carDetails: {
     model: String,
     licensePlate: String,
@@ -57,5 +85,8 @@ const rideSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+
+rideSchema.index({ fromCoordinates: "2dsphere" });
+rideSchema.index({ toCoordinates: "2dsphere" });
 
 export default mongoose.model("Ride", rideSchema);

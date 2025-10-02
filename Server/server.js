@@ -13,7 +13,6 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
 connectDB();
 
 const app = express();
@@ -21,6 +20,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+console.log("SERVICE_SECRET:", process.env.SERVICE_SECRET);
 
 app.use("/api/protected", protectedRoute);
 app.use("/api/rides", rideRoute);

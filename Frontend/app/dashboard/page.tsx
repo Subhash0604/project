@@ -1,36 +1,77 @@
 'use client';
 
 import { auth } from '../firebase';
-import { useEffect } from 'react';
+import { getRidesByMe, getBookingByMe } from "../../lib/api";
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { MapPin, Users, Car } from 'lucide-react';
-import { useDashboardStore } from '../../store/dashboardStore';
 
 export default function DashboardPage() {
-  const {
-    user, setUser,
-    ridesByMe, fetchRidesByMe,
-    bookingsByMe, fetchBookingsByMe,
-    loading
-  } = useDashboardStore();
-
+  const [user, setUser] = useState<any>(null);
+  const [ridesByMe, setRidesByMe] = useState<any[]>([]);
+  const [bookingsByMe,setBookingsByMe] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         setUser(user);
-        fetchRidesByMe();
-        fetchBookingsByMe();
       } else {
         router.push('/login');
       }
     });
-
     return () => unsubscribe();
-  }, [router, setUser, fetchRidesByMe, fetchBookingsByMe]);
+  }, [router]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchRidesByMe = async () => {
+      try {
+        setLoading(true);
+        const response = await getRidesByMe();
+
+        if (response.success && Array.isArray(response.rides)) {
+          const uniqueRides = Array.from(new Map(response.rides.map(ride => [ride._id, ride])).values());
+          setRidesByMe(uniqueRides);
+          console.log("My rides :",uniqueRides);
+        } else {
+          setRidesByMe([]);
+        }
+      } catch (error) {
+        console.error("Error fetching rides:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRidesByMe();
+  }, [user]);
+
+  useEffect(() => {
+    if(!user) return;
+    const fetchBookingsByMe = async () => {
+        try{
+        setLoading(true);
+        const response = await getBookingByMe();
+          console.log("my bookings :",response);
+        if (response.success) {
+          setBookingsByMe(response.bookings);
+        }else{
+          setBookingsByMe([]);
+        }
+      }catch (error){
+        console.error("error fetching bookings", error);
+      }finally {
+        setLoading(false);
+      }
+    }
+    fetchBookingsByMe();
+
+  }, [user]);
 
   if (!user) {
     return (
@@ -59,7 +100,7 @@ export default function DashboardPage() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Vehicles</CardTitle>
+              <CardTitle className="text-sm font-medium">Distance Traveled</CardTitle>
               <MapPin className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -69,7 +110,7 @@ export default function DashboardPage() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Travel Preferences</CardTitle>
+              <CardTitle className="text-sm font-medium">CO₂ Saved</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -87,42 +128,60 @@ export default function DashboardPage() {
           </TabsList>
 
           {/* Rides By Me */}
-          <TabsContent value="past" className="space-y-4">
-            {loading ? (
-              <p className="text-gray-400 text-center text-lg animate-pulse">Loading rides...</p>
-            ) : ridesByMe.length === 0 ? (
-              <p className="text-gray-500 text-center text-lg">No rides found.</p>
-            ) : (
-              ridesByMe.map((ride) => (
-                <Card key={ride._id} className="p-5 bg-gray-950 border border-gray-700 rounded-xl shadow-md hover:shadow-2xl transition duration-300">
-                  <CardHeader>
-                    <CardTitle className="text-xl font-semibold text-white">
-                      {ride.from} ➝ {ride.to}
-                    </CardTitle>
-                    <CardDescription className="text-gray-400 text-sm">
-                      📅 {ride.date} at ⏰ {ride.time}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="text-gray-300 space-y-3">
-                    <p><strong className="text-indigo-400">🪑 Seats:</strong> {ride.availableSeats}</p>
-                    <p><strong className="text-indigo-400">💰 Price:</strong> ₹{ride.pricePerSeat}</p>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </TabsContent>
+            <TabsContent value="past" className="space-y-4">
+              {loading ? (
+                <p className="text-gray-300 text-center text-lg">Loading rides...</p>
+              ) : ridesByMe.length === 0 ? (
+                <p className="text-gray-500 text-center text-lg">No rides found.</p>
+              ) : (
+                ridesByMe.map((ride) => (
+                  <Card
+                    key={ride._id}
+                    className="p-4 bg-gray-800 border border-gray-700 rounded-lg shadow-md hover:shadow-lg transition"
+                  >
+                    <CardHeader>
+                      <CardTitle className="text-lg font-semibold text-white">
+                        {ride.from} ➝ {ride.to}
+                      </CardTitle>
+                      <CardDescription className="text-gray-400">
+                        📅 {ride.date} at ⏰ {ride.time}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="text-gray-300 space-y-2">
+                      <p>
+                        <strong className="text-gray-400">🪑 Seats:</strong> {ride.availableSeats}
+                      </p>
+                      <p>
+                        <strong className="text-gray-400">💰 Price:</strong> ₹{ride.pricePerSeat}
+                      </p>
+                      <p>
+                        <strong className="text-gray-400">🚗 Car:</strong>{" "}
+                        {ride.carDetails?.make} {ride.carDetails?.model} ({ride.carDetails?.color})
+                      </p>
+                      <p
+                        className={`font-semibold ${
+                          ride?.status === "available" ? "text-green-500" : "text-red-500"
+                        }`}
+                      >
+                        🔄 Status: {ride?.status}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </TabsContent>
 
           {/* Booking by Me */}
           <TabsContent value="upcoming" className="space-y-4">
             {loading ? (
-              <p className="text-gray-400 text-center text-lg animate-pulse">Loading bookings...</p>
+              <p className="text-gray-500 text-center text-lg">Loading bookings...</p>
             ) : bookingsByMe.length === 0 ? (
               <p className="text-gray-500 text-center text-lg">No bookings found.</p>
             ) : (
               bookingsByMe.map((booking) => (
-                <Card key={booking._id} className="p-5 shadow-lg border border-gray-700 rounded-xl bg-gray-950 text-white hover:shadow-xl transition duration-300">
+                <Card key={booking._id} className="p-4 shadow-lg border border-gray-700 rounded-xl bg-gray-900 text-white">
                   <CardHeader>
-                    <CardTitle className="text-xl font-semibold text-white">
+                    <CardTitle className="text-lg font-semibold text-white">
                       {booking.ride ? (
                         <>
                           {booking.ride.from} ➝ {booking.ride.to}
@@ -131,13 +190,24 @@ export default function DashboardPage() {
                         "Ride details unavailable"
                       )}
                     </CardTitle>
-                    <CardDescription className="text-gray-400 text-sm">
-                      {booking.ride ? `${booking.ride.date} at ${booking.ride.time}` : "N/A"}
+                    <CardDescription className="text-gray-400">
+                    {booking.ride ? `${booking.ride.date} at ${booking.ride.time}` : "N/A"}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-3 text-gray-300">
-                    <p><strong className="text-indigo-400">Seats Booked:</strong> {booking.seatsBooked}</p>
-                    <p><strong className="text-indigo-400">Price:</strong> ₹ {booking.ride ? booking.ride.pricePerSeat * booking.seatsBooked : "N/A"}</p>
+                  <CardContent className="space-y-2">
+                    <p>
+                      <strong className="text-slate-300">Seats Booked:</strong> {booking.seatsBooked}
+                    </p>
+                    <p>
+                      <strong className="text-slate-300">Price:</strong> ₹ {booking.ride ? booking.ride.pricePerSeat * booking.seatsBooked : "N/A"}
+                    </p>
+                    <p>
+                      <strong className="text-slate-300">Car:</strong>
+                      {booking.ride?.carDetails ? `${booking.ride.carDetails.make} ${booking.ride.carDetails.model} (${booking.ride.carDetails.color})` : "N/A"}
+                    </p>
+                    <p>
+                      <strong className="text-slate-300">Status:</strong> {booking.status}
+                    </p>
                   </CardContent>
                 </Card>
               ))

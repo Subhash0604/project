@@ -4,16 +4,20 @@ import userModel from "../models/userModel.js";
 
 export const offerRide = async (req, res) => {
   try {
-    if (!req.body || Object.keys(req.body).length === 0) {
-      return res.status(400).json({
-        success: false,
-        error: "Request body is missing (Check JSON Parsing)",
-      });
-    }
+    const { uid } = req.user;
 
-    const { from, to, date, time, availableSeats, pricePerSeat, carDetails } = req.body;
+    const {
+      from,
+      to,
+      date,
+      time,
+      availableSeats,
+      pricePerSeat,
+      carDetails,
+      fromCoordinates,
+      toCoordinates,
+    } = req.body;
 
-    // Ensure carDetails object has necessary fields
     if (
       !from ||
       !to ||
@@ -23,25 +27,37 @@ export const offerRide = async (req, res) => {
       !pricePerSeat ||
       !carDetails?.model ||
       !carDetails?.licensePlate ||
-      !carDetails?.color
+      !carDetails?.color ||
+      !fromCoordinates ||
+      !toCoordinates ||
+      !Array.isArray(fromCoordinates) ||
+      !Array.isArray(toCoordinates) ||
+      fromCoordinates.length !== 2 ||
+      toCoordinates.length !== 2
     ) {
-      return res.status(400).json({ success: false, error: "All fields are required" });
+      return res.status(400).json({
+        success: false,
+        error: "All fields including coordinates are required",
+      });
     }
 
-    // Fetch authenticated user details
-    const driver = await userModel.findOne({ uid: req.user.uid });
-
+    const driver = await userModel.findOne({ uid });
     if (!driver) {
       return res.status(401).json({ success: false, error: "User not found" });
     }
 
-    // Create and save new ride
-    const newRide = await rideModel.create({
+    await rideModel.create({
       driver: driver._id,
-      driverId: driver.uid,
-      driverName: driver.name,
       from,
       to,
+      fromCoordinates: {
+        type: "Point",
+        coordinates: fromCoordinates,
+      },
+      toCoordinates: {
+        type: "Point",
+        coordinates: toCoordinates,
+      },
       date,
       time,
       availableSeats,
@@ -49,11 +65,101 @@ export const offerRide = async (req, res) => {
       carDetails,
     });
 
-    res.status(201).json({ success: true, message: "Ride created successfully", ride: newRide });
-
+    res
+      .status(201)
+      .json({ success: true, message: "Ride created successfully" });
   } catch (error) {
-    console.error("Backend Error:", error);
+    console.error(error);
     res.status(500).json({ success: false, error: "Server Side Error" });
+  }
+};
+
+export const searchRides = async (req, res) => {
+  try {
+    console.log("Received Query:", req.query);
+
+    let { from, to, date } = req.query;
+
+    if (!from || !to || !date) {
+      return res
+        .status(400)
+        .json({ success: false, error: "All fields are required" });
+    }
+
+    from = from.trim();
+    to = to.trim();
+    date = date.trim();
+
+    const rides = await rideModel.aggregate([
+      {
+        $match: {
+          from: { $regex: `^${from}$`, $options: "i" },
+          to: { $regex: `^${to}$`, $options: "i" },
+          date: date,
+          availableSeats: { $gt: 0 },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "BookingUsers",
+          foreignField: "_id",
+          as: "Users",
+        },
+      },
+    ]);
+
+    return res.status(200).json({ success: true, rides });
+  } catch (error) {
+    console.error("Search error:", error);
+    return res.status(500).json({ success: false, error: "Server error" });
+  }
+};
+
+export const bookARide = async (req, res) => {
+  try {
+    const { uid } = req.user;
+
+    const { rideId } = req.params;
+
+    const { seats } = req.body;
+
+    const user = await userModel.findOne({ uid });
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, error: "Login to Book a ride" });
+    }
+
+    const ride = await rideModel.findById(rideId);
+
+    if (!ride) {
+      return res.status(404).json({ success: false, error: "Ride not found" });
+    }
+
+    if (ride.status !== "available") {
+      return res
+        .status(400)
+        .json({ success: false, error: "Requested ride is not available" });
+    }
+
+    ride.BookingUsers.push(user._id);
+    ride.save();
+
+    const newBooking = await bookingModel.create({
+      ride: ride._id,
+      passenger: user._id,
+      seatsBooked: seats,
+    });
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Ride requested Successfully" });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({ success: false, error: "Server Side Error" });
   }
 };
 
@@ -66,125 +172,15 @@ export const getRidesByMe = async (req, res) => {
       return res.status(404).json({ success: false, error: "user not found" });
     }
 
-    const rides = await rideModel.find({ driver: user._id });
+    const rides = await rideModel
+      .find({ driver: user._id })
+      .sort({ createdAt: -1 });
 
     return res.status(200).json({ success: true, rides });
   } catch (error) {
     console.log(error);
 
     res.status(500).json({ success: false, error: "Server Side Error" });
-  }
-};
-
-export const searchRides = async (req, res) => {
-  try {
-    console.log("Received Query:", req.query);
-
-    let { from, to, date } = req.query;
-
-    if (!from || !to || !date) {
-      return res.status(400).json({ success: false, error: "All fields are required" });
-    }
-
-    // Trim input values to remove extra spaces
-    from = from.trim();
-    to = to.trim();
-    date = date.trim();
-
-
-    // Use case-insensitive search
-    const rides = await rideModel.find({
-      from: new RegExp(`^${from}$`, "i"), // Case-insensitive regex
-      to: new RegExp(`^${to}$`, "i"),
-      date, // Keep it as it is (assuming DB stores YYYY-MM-DD)
-      availableSeats: { $gt: 0 }, // Ensures only rides with available seats are shown
-    });
-
-    return res.json({ success: true, rides });
-  } catch (error) {
-    console.error("Search error:", error);
-    return res.status(500).json({ success: false, error: "Server error" });
-  }
-};
-
-export const bookARide = async (req, res) => {
-  try {
-    console.log("🔹 Booking request received:", req.params, req.body);
-
-    const { uid } = req.user; // User ID from Firebase token
-    const { rideId } = req.params;
-    const { seats } = req.body;
-
-    console.log("User ID:", uid);
-    console.log("Ride ID:", rideId);
-    console.log("Seats requested:", seats);
-
-    // Check if user exists
-    const user = await userModel.findOne({ uid });
-    if (!user) {
-      console.log("User not found");
-      return res.status(401).json({ success: false, error: "Login to book a ride" });
-    }
-
-    // Find the ride
-    const ride = await rideModel.findById(rideId);
-    if (!ride) {
-      console.log("Ride not found");
-      return res.status(404).json({ success: false, error: "Ride not found" });
-    }
-
-    if (ride.status !== "available") {
-      console.log("Ride is not available");
-      return res.status(400).json({ success: false, error: "Ride is not available" });
-    }
-
-    // ❗ Check if enough seats are available
-    if (ride.availableSeats < seats) {
-      console.log("Not enough seats available");
-      return res.status(400).json({ success: false, error: "Not enough seats available" });
-    }
-
-    // Create booking
-    const newBooking = await bookingModel.create({
-      ride: ride._id,
-      passenger: user._id,
-      seatsBooked: seats,
-    });
-
-    // Update ride seat count
-    ride.availableSeats -= seats;
-    if (ride.availableSeats === 0) {
-      ride.status = "booked"; // Mark as fully booked
-    }
-    await ride.save();
-
-    console.log("Ride booked successfully");
-    return res.status(200).json({
-      success: true,
-      message: "Ride booked successfully",
-      booking: newBooking,
-    });
-  } catch (error) {
-    console.error("Server Error:", error);
-    return res.status(500).json({ success: false, error: "Server Side Error" });
-  }
-};
-
-export const getBookingsByUser = async (req, res) => {
-  try {
-    console.log(req);
-    const { uid } = req.user;
-    const user = await userModel.findOne({uid});
-    if(!user){
-      return res.status(401).json({status : false, error: "user not found"});
-    }
-
-    const bookings = await bookingModel.find({ passenger: user._id }).populate("ride");
-
-   return res.status(200).json({ success: true, bookings });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ success: false, error: "Server Side Error" });
   }
 };
 
@@ -196,7 +192,7 @@ export const cancelBooking = async (req, res) => {
     const user = await userModel.findOne({ uid });
 
     if (!user) {
-      return res.status(401).json({ success: false, error: "User not found" });
+      return res(401).json({ success: false, error: "User not found" });
     }
 
     const booking = await bookingModel.findById(bookingId);
@@ -217,7 +213,7 @@ export const cancelBooking = async (req, res) => {
     if (booking.status !== "pending" && booking.status !== "accepted") {
       return res
         .status(400)
-        .json({ success: false, error: "Booking already canceled" });
+        .json({ sucess: false, error: "Booking already canceled" });
     }
 
     if (booking.status === "pending") {
@@ -352,5 +348,82 @@ export const acceptBooking = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ success: false, error: "Server side error" });
+  }
+};
+
+export const getBookings = async (req, res) => {
+  try {
+    const { rideId } = req.params;
+    const { uid } = req.user;
+
+    const ride = await rideModel.findById(rideId);
+
+    if (!ride) {
+      return res.status(404).json({ success: false, error: "Ride not found" });
+    }
+
+    const user = await userModel.findOne({ uid });
+
+    if (!user) {
+      return res.status(401).json({ success: false, error: "User not found" });
+    }
+
+    if (!ride.driver.equals(user._id)) {
+      return res.status(403).json({ success: false, error: "UnAuthorized" });
+    }
+
+    const bookings = await bookingModel
+      .find({ ride: ride._id })
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({ success: true, bookings });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ success: false, error: "Server Side Error" });
+  }
+};
+
+export const getBookingsByUser = async (req, res) => {
+  try {
+    console.log(req);
+    const { uid } = req.user;
+    const user = await userModel.findOne({ uid });
+    if (!user) {
+      return res.status(401).json({ status: false, error: "user not found" });
+    }
+
+    const bookings = await bookingModel
+      .find({ passenger: user._id })
+      .sort({ createdAt: -1 })
+      .populate("ride");
+
+    return res.status(200).json({ success: true, bookings });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ success: false, error: "Server Side Error" });
+  }
+};
+
+export const getRide = async (req, res) => {
+  try {
+    const { rideId } = req.params;
+    const { uid } = req.user;
+
+    const ride = await rideModel.findById(rideId);
+
+    if (!ride) {
+      return res.status(404).json({ success: false, error: "Ride not found" });
+    }
+
+    const user = await userModel.findOne({ uid });
+
+    if (!user) {
+      return res.status(401).json({ success: false, error: "User not found" });
+    }
+
+    return res.status(200).json({ success: true, ride });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ success: false, error: "Server Side Error" });
   }
 };
