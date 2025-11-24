@@ -36,7 +36,7 @@ export default function LoginPage() {
           uid: user.uid,
           email: user.email,
           displayName: user.displayName,
-          // photoURL: imgURL,  
+          photoURL: user.photoURL,  
         },
       });
       const token = await userCredential.user.getIdToken();
