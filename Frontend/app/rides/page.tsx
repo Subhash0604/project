@@ -20,7 +20,6 @@ import LocationInput, {
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 
-// Lazy load MapPreview
 const MapPreview = dynamic(() => import("../../components/ui/MapPreview"), {
   ssr: false,
 });
@@ -57,18 +56,18 @@ export default function RidesPage() {
 
   const handleBookRide = async (rideId: string) => {
     if (!availableSeats || availableSeats < 1) {
-      alert("Please select a valid number of passengers.");
+      toast.error("Please select a valid number of passengers.");
       return;
     }
 
     setBookingRideId(rideId);
     try {
       await bookARide(rideId, availableSeats);
-      toast("Ride booked successfully!");
+      toast.success("Ride booked successfully!");
       handleSearch();
     } catch (error: any) {
       console.error("Booking error:", error);
-      toast(error.response?.data?.error || "Booking failed.");
+      toast.error(error.response?.data?.error || "Booking failed.");
     } finally {
       setBookingRideId(null);
     }
