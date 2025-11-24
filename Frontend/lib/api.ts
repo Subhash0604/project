@@ -120,7 +120,7 @@ export const bookARide = async (rideId: string, seats: number) => {
 };
 
 // get Booking by me
-export const getBookingByMe = async (rideId: string) => {
+export const getBookingByMe = async () => {
   const token = await getAuthToken();
   if (!token) throw new Error("user not authenticated");
 
@@ -171,5 +171,25 @@ export const rejectBooking = async (bookingId: string) => {
 export const acceptBooking = async (bookingId: string) => {
   return api.post(`/api/rides/acceptBooking/${bookingId}`);
 };
+
+// get ride by ID
+export const getRideById = async (rideId: string) => {
+  const token = await getAuthToken();
+  if (!token) throw new Error("User not authenticated");
+
+  try {
+    const response = await api.get(`/api/rides/${rideId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error("Fetching ride by ID failed:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+
 
 export default api;

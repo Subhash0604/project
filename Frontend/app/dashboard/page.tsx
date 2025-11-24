@@ -128,91 +128,152 @@ export default function DashboardPage() {
           </TabsList>
 
           {/* Rides By Me */}
-            <TabsContent value="past" className="space-y-4">
-              {loading ? (
-                <p className="text-gray-300 text-center text-lg">Loading rides...</p>
-              ) : ridesByMe.length === 0 ? (
-                <p className="text-gray-500 text-center text-lg">No rides found.</p>
-              ) : (
-                ridesByMe.map((ride) => (
-                  <Card
-                    key={ride._id}
-                    className="p-4 bg-gray-800 border border-gray-700 rounded-lg shadow-md hover:shadow-lg transition"
-                  >
-                    <CardHeader>
-                      <CardTitle className="text-lg font-semibold text-white">
-                        {ride.from} ➝ {ride.to}
-                      </CardTitle>
-                      <CardDescription className="text-gray-400">
-                        📅 {ride.date} at ⏰ {ride.time}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="text-gray-300 space-y-2">
-                      <p>
-                        <strong className="text-gray-400">🪑 Seats:</strong> {ride.availableSeats}
-                      </p>
-                      <p>
-                        <strong className="text-gray-400">💰 Price:</strong> ₹{ride.pricePerSeat}
-                      </p>
-                      <p>
-                        <strong className="text-gray-400">🚗 Car:</strong>{" "}
-                        {ride.carDetails?.make} {ride.carDetails?.model} ({ride.carDetails?.color})
-                      </p>
-                      <p
-                        className={`font-semibold ${
-                          ride?.status === "available" ? "text-green-500" : "text-red-500"
-                        }`}
-                      >
-                        🔄 Status: {ride?.status}
-                      </p>
-                    </CardContent>
-                  </Card>
-                ))
-              )}
-            </TabsContent>
+           <TabsContent value="past" className="space-y-4">
+  {loading ? (
+    <p className="text-muted-foreground text-center text-lg">Loading rides...</p>
+  ) : ridesByMe.length === 0 ? (
+    <p className="text-muted-foreground text-center text-lg">No rides found.</p>
+  ) : (
+    ridesByMe.map((ride) => (
+      <Card
+        key={ride._id}
+        className="border bg-card rounded-xl shadow-sm hover:shadow-md transition"
+      >
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg font-semibold">
+              {ride.from} → {ride.to}
+            </CardTitle>
+
+            {/* Status Badge */}
+            <span
+              className={`text-xs px-2 py-1 rounded-full font-medium
+                ${
+                  ride?.status === 'available'
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-700'
+                }`}
+            >
+              {ride?.status}
+            </span>
+          </div>
+
+          <CardDescription className="text-sm text-muted-foreground">
+            {ride.date} • {ride.time}
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent className="space-y-3 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <Users className="h-4 w-4 text-muted-foreground" />
+            <span>
+              <span className="font-medium text-foreground">
+                {ride.availableSeats}
+              </span>{' '}
+              seats available
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Car className="h-4 w-4 text-muted-foreground" />
+            <span className="text-foreground font-medium">
+              ₹{ride.pricePerSeat}
+            </span>
+            <span>/ seat</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Car className="h-4 w-4 text-muted-foreground" />
+            <span>
+              {ride.carDetails?.make} {ride.carDetails?.model}{' '}
+              ({ride.carDetails?.color})
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+    ))
+  )}
+</TabsContent>
+
 
           {/* Booking by Me */}
           <TabsContent value="upcoming" className="space-y-4">
-            {loading ? (
-              <p className="text-gray-500 text-center text-lg">Loading bookings...</p>
-            ) : bookingsByMe.length === 0 ? (
-              <p className="text-gray-500 text-center text-lg">No bookings found.</p>
-            ) : (
-              bookingsByMe.map((booking) => (
-                <Card key={booking._id} className="p-4 shadow-lg border border-gray-700 rounded-xl bg-gray-900 text-white">
-                  <CardHeader>
-                    <CardTitle className="text-lg font-semibold text-white">
-                      {booking.ride ? (
-                        <>
-                          {booking.ride.from} ➝ {booking.ride.to}
-                        </>
-                      ) : (
-                        "Ride details unavailable"
-                      )}
-                    </CardTitle>
-                    <CardDescription className="text-gray-400">
-                    {booking.ride ? `${booking.ride.date} at ${booking.ride.time}` : "N/A"}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <p>
-                      <strong className="text-slate-300">Seats Booked:</strong> {booking.seatsBooked}
-                    </p>
-                    <p>
-                      <strong className="text-slate-300">Price:</strong> ₹ {booking.ride ? booking.ride.pricePerSeat * booking.seatsBooked : "N/A"}
-                    </p>
-                    <p>
-                      <strong className="text-slate-300">Car:</strong>
-                      {booking.ride?.carDetails ? `${booking.ride.carDetails.make} ${booking.ride.carDetails.model} (${booking.ride.carDetails.color})` : "N/A"}
-                    </p>
-                    <p>
-                      <strong className="text-slate-300">Status:</strong> {booking.status}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </TabsContent>
+  {loading ? (
+    <p className="text-muted-foreground text-center text-lg">
+      Loading bookings...
+    </p>
+  ) : bookingsByMe.length === 0 ? (
+    <p className="text-muted-foreground text-center text-lg">
+      No bookings found.
+    </p>
+  ) : (
+    bookingsByMe.map((booking) => {
+      const ride = booking.ride;
+
+      return (
+        <Card
+          key={booking._id}
+          className="border bg-card rounded-xl shadow-sm hover:shadow-md transition"
+        >
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg font-semibold">
+                {ride ? `${ride.from} → ${ride.to}` : "Ride details unavailable"}
+              </CardTitle>
+
+              {/* Status Badge */}
+              <span
+                className={`text-xs px-2 py-1 rounded-full font-medium
+                  ${
+                    booking.status === "confirmed"
+                      ? "bg-green-100 text-green-700"
+                      : booking.status === "cancelled"
+                      ? "bg-red-100 text-red-700"
+                      : "bg-yellow-100 text-yellow-700"
+                  }`}
+              >
+                {booking.status}
+              </span>
+            </div>
+
+            <CardDescription className="text-sm text-muted-foreground">
+              {ride ? `${ride.date} • ${ride.time}` : "N/A"}
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              <span>
+                <span className="font-medium text-foreground">
+                  {booking.seatsBooked}
+                </span>{" "}
+                seats booked
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Car className="h-4 w-4 text-muted-foreground" />
+              <span>
+                {ride?.carDetails
+                  ? `${ride.carDetails.make} ${ride.carDetails.model} (${ride.carDetails.color})`
+                  : "Car info unavailable"}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-foreground">
+                ₹ {ride ? ride.pricePerSeat * booking.seatsBooked : "N/A"}
+              </span>
+              <span className="text-muted-foreground">total</span>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    })
+  )}
+</TabsContent>
+
         </Tabs>
       </div>
     </div>

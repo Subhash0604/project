@@ -34,7 +34,8 @@ import { cn } from "../../lib/utils";
 import LocationInput, {
   LocationFeature,
 } from "../../components/ui/LocationInput";
-
+import { Toast } from "../../components/ui/toast"
+import { toast } from "sonner";
 export default function OfferRidePage() {
   const [user, setUser] = useState<any>(null);
   const [date, setDate] = useState<Date | null>(null);
@@ -92,7 +93,7 @@ export default function OfferRidePage() {
     try {
       setLoading(true);
       await offerRide(rideData);
-      alert("Ride offered successfully!");
+      toast.success("Ride offered successfully!");
       form.reset();
       setDate(null);
       setFrom("");
@@ -103,7 +104,7 @@ export default function OfferRidePage() {
     } catch (error: any) {
       console.error("Error offering ride:", error);
       if (error.response) {
-        alert(`Error: ${error.response.data.error || "Failed to offer ride"}`);
+        toast.error("Error offering ride",error)
       }
     } finally {
       setLoading(false);

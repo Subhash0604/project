@@ -28,7 +28,7 @@ export default function Home() {
             Connect with travelers heading your way and make your journey more affordable and sustainable
           </p>
           
-          <Card className="bg-white/95 backdrop-blur-sm">
+          {/* <Card className="bg-white/95 backdrop-blur-sm">
             <CardContent className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="relative">
@@ -49,7 +49,7 @@ export default function Home() {
                 </Button>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
       </section>
 
