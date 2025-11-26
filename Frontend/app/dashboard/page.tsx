@@ -140,7 +140,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Tabs for Rides */}
-        <Tabs defaultValue="upcoming" className="space-y-4">
+        <Tabs defaultValue="past" className="space-y-4">
           <TabsList>
             <TabsTrigger value="past">Rides By Me</TabsTrigger>
             <TabsTrigger value="upcoming">Bookings By Me</TabsTrigger>
@@ -166,7 +166,10 @@ export default function DashboardPage() {
                 return (
                   <Card
                     key={ride._id}
-                    className="border bg-card rounded-xl shadow-sm hover:shadow-md transition"
+                    className="border bg-card cursor-pointer rounded-xl shadow-sm hover:shadow-md transition"
+                    onClick={() => {
+                      router.push(`rides/${ride._id}`);
+                    }}
                   >
                     <CardHeader>
                       <div className="flex items-center justify-between">
