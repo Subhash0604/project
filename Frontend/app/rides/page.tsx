@@ -2,9 +2,15 @@
 
 import { useState } from "react";
 import { Button } from "../../components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
-import { MapPin, Calendar, Users, Car } from "lucide-react";
+import { Calendar, Users, Car } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -80,7 +86,6 @@ export default function RidesPage() {
         <div className="max-w-7xl mx-auto p-6">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div className="relative">
-              <MapPin className="absolute left-3 top-3 h-5 w-5 text-muted-foreground z-10" />
               <div className="pl-10">
                 <LocationInput
                   value={from}
@@ -94,7 +99,6 @@ export default function RidesPage() {
             </div>
 
             <div className="relative">
-              <MapPin className="absolute left-3 top-3 h-5 w-5 text-muted-foreground z-10" />
               <div className="pl-10">
                 <LocationInput
                   value={to}
@@ -151,90 +155,91 @@ export default function RidesPage() {
 
       {/* Ride List */}
       <div className="max-w-7xl mx-auto p-6">
-  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    {rides.length === 0 ? (
-      <p className="text-center text-muted-foreground text-lg">
-        No rides found.
-      </p>
-    ) : (
-      rides.map((ride) => {
-        const isUserBooked = ride.Users?.some(
-          (u: any) => u.uid === user?.uid
-        );
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {rides.length === 0 ? (
+            <p className="text-center text-muted-foreground text-lg">
+              No rides found.
+            </p>
+          ) : (
+            rides.map((ride) => {
+              const isUserBooked = ride.Users?.some(
+                (u: any) => u.uid === user?.uid
+              );
 
-        return (
-          <Card
-            key={ride._id}
-            className="border bg-card rounded-xl shadow-sm hover:shadow-md transition"
-          >
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-semibold">
-                  {ride.from} → {ride.to}
-                </CardTitle>
+              return (
+                <Card
+                  key={ride._id}
+                  className="border bg-card rounded-xl shadow-sm hover:shadow-md transition"
+                >
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg font-semibold">
+                        {ride.from} → {ride.to}
+                      </CardTitle>
 
-                <span
-                  className={`text-xs px-2 py-1 rounded-full font-medium
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full font-medium
                     ${
                       ride.status === "available"
                         ? "bg-green-100 text-green-700"
                         : "bg-red-100 text-red-700"
                     }`}
-                >
-                  {ride.status}
-                </span>
-              </div>
-              <CardDescription className="text-sm text-muted-foreground">
-                {ride.date} • {ride.time}
-              </CardDescription>
-            </CardHeader>
+                      >
+                        {ride.status}
+                      </span>
+                    </div>
+                    <CardDescription className="text-sm text-muted-foreground">
+                      {ride.date} • {ride.time}
+                    </CardDescription>
+                  </CardHeader>
 
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-muted-foreground" />
-                <span>
-                  <span className="font-medium text-foreground">
-                    {ride.availableSeats}
-                  </span>{" "}
-                  seats available
-                </span>
-              </div>
+                  <CardContent className="space-y-3 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      <span>
+                        <span className="font-medium text-foreground">
+                          {ride.availableSeats}
+                        </span>{" "}
+                        seats available
+                      </span>
+                    </div>
 
-              <div className="flex items-center gap-2">
-                <Car className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium text-foreground">
-                  ${ride.pricePerSeat} per seat
-                </span>
-              </div>
+                    <div className="flex items-center gap-2">
+                      <Car className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium text-foreground">
+                        ${ride.pricePerSeat} per seat
+                      </span>
+                    </div>
 
-              <div className="flex items-center gap-2">
-                <Car className="h-4 w-4 text-muted-foreground" />
-                <span>
-                  {ride.carDetails?.make} {ride.carDetails?.model}
-                </span>
-              </div>
+                    <div className="flex items-center gap-2">
+                      <Car className="h-4 w-4 text-muted-foreground" />
+                      <span>
+                        {ride.carDetails?.make} {ride.carDetails?.model}
+                      </span>
+                    </div>
 
-              {isUserBooked ? (
-                <Button disabled className="w-full bg-gray-400 mt-2">
-                  Booking Processing
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => handleBookRide(ride._id)}
-                  disabled={bookingRideId === ride._id}
-                  className="w-full bg-white text-black hover:text-black  mt-2"
-                >
-                  {bookingRideId === ride._id ? "Booking..." : "Book Ride"}
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        );
-      })
-    )}
-  </div>
-</div>
-
+                    {isUserBooked ? (
+                      <Button disabled className="w-full bg-gray-400 mt-2">
+                        Booking Processing
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => handleBookRide(ride._id)}
+                        disabled={bookingRideId === ride._id}
+                        className="w-full bg-white text-black hover:text-black  mt-2"
+                      >
+                        {bookingRideId === ride._id
+                          ? "Booking..."
+                          : "Book Ride"}
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })
+          )}
+        </div>
+      </div>
     </div>
   );
 }
