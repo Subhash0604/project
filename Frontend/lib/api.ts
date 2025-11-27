@@ -1,7 +1,6 @@
 import axios from "axios";
 import { auth } from "../app/firebase";
 
-
 const API_BASE_URL = "http://localhost:8000";
 
 // firebase auth token
@@ -40,7 +39,7 @@ export const offerRide = async (rideData: {
     color: string;
   };
   fromCoordinates: [number, number]; // [lng, lat]
-  toCoordinates: [number, number];   // [lng, lat]
+  toCoordinates: [number, number]; // [lng, lat]
 }) => {
   try {
     const token = await getAuthToken();
@@ -56,15 +55,13 @@ export const offerRide = async (rideData: {
   }
 };
 
-
 // rides by me
 export const getRidesByMe = async () => {
   try {
     const token = await getAuthToken();
-    const response = await api.get("/api/rides/getRidesByMe",
-        {
-          headers : {Authorization : `Bearer ${token}`},
-        });
+    const response = await api.get("/api/rides/getRidesByMe", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     return response.data;
   } catch (error: any) {
@@ -87,9 +84,12 @@ export const searchRides = async ({
 }) => {
   try {
     const params = new URLSearchParams({ from, to, date });
-    if (availableSeats) params.append("availableSeats", availableSeats.toString());
+    if (availableSeats)
+      params.append("availableSeats", availableSeats.toString());
 
-    const response = await api.get(`api/rides/searchRides?${params.toString()}`);
+    const response = await api.get(
+      `api/rides/searchRides?${params.toString()}`
+    );
     return response.data;
   } catch (error: any) {
     console.error("Search Error:", error.response?.data);
@@ -124,17 +124,14 @@ export const getBookingByMe = async () => {
   const token = await getAuthToken();
   if (!token) throw new Error("user not authenticated");
 
-  try{
-    const response = await api.get(
-        `/api/rides/getBookingsByUser`,
-        {
-          headers:{
-          Authorization: `Bearer ${token}`,
-          },
-        }
-    )
+  try {
+    const response = await api.get(`/api/rides/getBookingsByUser`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
-  }catch(error: any) {
+  } catch (error: any) {
     console.error("fetching bookings failed:", error.response?.data);
     throw error;
   }
@@ -158,7 +155,10 @@ export const cancelBooking = async (bookingId: string) => {
     );
     return response.data;
   } catch (error: any) {
-    console.error("Cancel Booking Failed:", error.response?.data || error.message);
+    console.error(
+      "Cancel Booking Failed:",
+      error.response?.data || error.message
+    );
     throw error;
   }
 };
@@ -173,23 +173,20 @@ export const acceptBooking = async (bookingId: string) => {
 };
 
 // get ride by ID
-export const getRideById = async (rideId: string) => {
-  const token = await getAuthToken();
-  if (!token) throw new Error("User not authenticated");
+export const getRideById = async (rideId: string, token: string) => {
+  const response = await api.get(`/api/rides/getRide/${rideId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
-  try {
-    const response = await api.get(`/api/rides/${rideId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error: any) {
-    console.error("Fetching ride by ID failed:", error.response?.data || error.message);
-    throw error;
-  }
+  return response.data;
 };
 
+export const getBookingsOfRide = async (rideId: string, token: string) => {
+  const response = await api.get(`/api/rides/bookings/${rideId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
+  return response.data;
+};
 
 export default api;

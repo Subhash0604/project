@@ -269,7 +269,7 @@ export const rejectBooking = async (req, res) => {
         .json({ success: false, error: "Request already processed" });
     }
 
-    booking.status = "cancelled_by_driver";
+    booking.status = "rejected";
     await booking.save();
 
     res.status(200).json({
@@ -374,7 +374,8 @@ export const getBookings = async (req, res) => {
 
     const bookings = await bookingModel
       .find({ ride: ride._id })
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .populate("passenger");
 
     return res.status(200).json({ success: true, bookings });
   } catch (error) {
