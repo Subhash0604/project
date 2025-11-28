@@ -90,6 +90,7 @@ export const searchRides = async ({
     const response = await api.get(
       `api/rides/searchRides?${params.toString()}`
     );
+    console.log(response);
     return response.data;
   } catch (error: any) {
     console.error("Search Error:", error.response?.data);

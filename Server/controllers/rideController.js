@@ -78,7 +78,11 @@ export const searchRides = async (req, res) => {
   try {
     console.log("Received Query:", req.query);
 
-    let { from, to, date } = req.query;
+    let { from, to, date, availableSeats } = req.query;
+
+    console.log(from === "Hyderabad, Telangana, India");
+
+    let seats = Number(availableSeats);
 
     if (!from || !to || !date) {
       return res
@@ -93,10 +97,10 @@ export const searchRides = async (req, res) => {
     const rides = await rideModel.aggregate([
       {
         $match: {
-          from: { $regex: `^${from}$`, $options: "i" },
-          to: { $regex: `^${to}$`, $options: "i" },
+          from: from,
+          to: to,
           date: date,
-          availableSeats: { $gt: 0 },
+          availableSeats: { $gte: seats },
         },
       },
       {
@@ -108,6 +112,8 @@ export const searchRides = async (req, res) => {
         },
       },
     ]);
+
+    console.log(rides);
 
     return res.status(200).json({ success: true, rides });
   } catch (error) {
