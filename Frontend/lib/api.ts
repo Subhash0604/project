@@ -172,6 +172,21 @@ export const acceptBooking = async (bookingId: string) => {
   return api.post(`/api/rides/acceptBooking/${bookingId}`);
 };
 
+export const AddNumber = async (phone: string) => {
+  const token = await getAuthToken(); // Get Firebase token
+  if (!token) throw new Error("User not authenticated");
+
+  const response = await api.post(
+    "/api/protected/update-phone",
+    { phone },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
 // get ride by ID
 export const getRideById = async (rideId: string, token: string) => {
   const response = await api.get(`/api/rides/getRide/${rideId}`, {
@@ -187,6 +202,49 @@ export const getBookingsOfRide = async (rideId: string, token: string) => {
   });
 
   return response.data;
+};
+
+export const completeRide = async (rideId: string) => {
+  const token = await getAuthToken(); // Get Firebase token
+  if (!token) throw new Error("User not authenticated");
+
+  try {
+    const response = await api.post(
+      `/api/rides/${rideId}/complete`,
+      { finalLocation: "..." },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+export const startRide = async (rideId: string) => {
+  const token = await getAuthToken(); // Get Firebase token
+  if (!token) throw new Error("User not authenticated");
+
+  try {
+    const response = await api.post(
+      `/api/rides/${rideId}/start`,
+      { finalLocation: "..." },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      const message = error.response.data?.message || "Failed to start ride";
+      throw new Error(message);
+    }
+    throw error;
+  }
 };
 
 export default api;

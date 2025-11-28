@@ -10,6 +10,8 @@ import {
   getBookingsByUser,
   searchRides,
   getRide,
+  completeRide,
+  startRide,
 } from "../controllers/rideController.js";
 import { verifyToken } from "../middlewares/verifyToken.js";
 
@@ -25,5 +27,7 @@ router.post("/acceptBooking/:bookingId", verifyToken, acceptBooking);
 router.get("/bookings/:rideId", verifyToken, getBookings);
 router.get("/getBookingsByUser", verifyToken, getBookingsByUser);
 router.get("/getRide/:rideId", verifyToken, getRide);
+router.post("/:rideId/complete", verifyToken, completeRide);
+router.post("/:rideId/start", verifyToken, startRide);
 
 export default router;

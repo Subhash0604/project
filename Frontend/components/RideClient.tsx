@@ -206,7 +206,7 @@ export default function BookButton({ params }: { params: { id: string } }) {
                   <div className="flex items-center gap-1">
                     <div className="rounded-full overflow-hidden w-8 h-8">
                       <Image
-                        src={booking.passenger.picture}
+                        src={`https://proxy.duckduckgo.com/iu/?u=${booking.passenger.picture}`}
                         width={30}
                         height={30}
                         alt="profile"
@@ -261,7 +261,7 @@ export default function BookButton({ params }: { params: { id: string } }) {
                     // </Button>
                     <></>
                   ) : (
-                    <div>
+                    <div className="flex justify-end gap-1">
                       <Button
                         onClick={() => {
                           handleAccept(booking._id);

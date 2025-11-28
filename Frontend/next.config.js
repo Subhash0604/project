@@ -4,15 +4,23 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    unoptimized: true, // already disables optimization
+    unoptimized: true, // optional, disables optimization
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "**", // allows all domains
+        hostname: "lh3.googleusercontent.com", // Specific subdomain for many profile pics
+        pathname: "/**",
       },
       {
-        protocol: "http",
-        hostname: "**",
+        protocol: "https",
+        hostname: "googleusercontent.com", // Base domain
+        pathname: "/**",
+      },
+      // If you are using Google services for sign-in, it's also common to see:
+      {
+        protocol: "https",
+        hostname: "cdn.pixabay.com",
+        pathname: "/**",
       },
     ],
   },

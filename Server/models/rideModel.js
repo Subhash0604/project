@@ -54,11 +54,22 @@ const rideSchema = new mongoose.Schema({
   },
   passengers: [
     {
-      user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+      name: {
+        type: String,
+        required: true,
       },
-      seatCount: {
+      phone: {
+        type: String,
+        required: true,
+      },
+      email: {
+        type: String,
+        required: true,
+      },
+      picture: {
+        type: String,
+      },
+      seatsBooked: {
         type: Number,
         required: true,
       },
