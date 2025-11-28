@@ -22,6 +22,7 @@ import {
 import useAuthStore from "../../store/useAuthStore";
 import { Separator } from "../../components/ui/separator";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -220,7 +221,7 @@ export default function SignUpPage() {
               variant="outline"
               disabled={isLoading}
             >
-              <img src="/google.svg" alt="Google" className="w-5 h-5" />
+              <Image src="/google.svg" alt="Google" width={10} height={10} className="w-5 h-5" />
               {isSignup ? "Sign in with Google" : "Sign up with Google"}
             </Button>
           </form>
