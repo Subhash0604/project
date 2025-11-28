@@ -10,10 +10,33 @@ router.post("/", verifyToken, async (req, res) => {
   let user = await userModel.findOne({ uid });
 
   if (!user) {
-    user = await userModel.create({ uid, name, email, picture: photoURL });
+    user = await userModel.create({
+      uid,
+      name,
+      email,
+      picture: photoURL,
+      phone: "",
+    });
   }
 
   res.status(200).json(user);
+});
+
+router.post("/update-phone", verifyToken, async (req, res) => {
+  const { phone } = req.body;
+  const { uid } = req.user;
+
+  try {
+    const user = await userModel.findOneAndUpdate(
+      { uid },
+      { phone },
+      { new: true }
+    );
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update phone" });
+  }
 });
 
 export default router;

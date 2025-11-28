@@ -78,7 +78,11 @@ export const searchRides = async (req, res) => {
   try {
     console.log("Received Query:", req.query);
 
-    let { from, to, date } = req.query;
+    let { from, to, date, availableSeats } = req.query;
+
+    console.log(from === "Hyderabad, Telangana, India");
+
+    let seats = Number(availableSeats);
 
     if (!from || !to || !date) {
       return res
@@ -93,10 +97,10 @@ export const searchRides = async (req, res) => {
     const rides = await rideModel.aggregate([
       {
         $match: {
-          from: { $regex: `^${from}$`, $options: "i" },
-          to: { $regex: `^${to}$`, $options: "i" },
+          from: from,
+          to: to,
           date: date,
-          availableSeats: { $gt: 0 },
+          availableSeats: { $gte: seats },
         },
       },
       {
@@ -108,6 +112,8 @@ export const searchRides = async (req, res) => {
         },
       },
     ]);
+
+    console.log(rides);
 
     return res.status(200).json({ success: true, rides });
   } catch (error) {
@@ -287,7 +293,10 @@ export const acceptBooking = async (req, res) => {
     const { bookingId } = req.params;
     const { uid } = req.user;
 
-    const booking = await bookingModel.findById(bookingId).populate("ride");
+    const booking = await bookingModel
+      .findById(bookingId)
+      .populate("ride")
+      .populate("passenger");
 
     if (!booking) {
       return res
@@ -327,6 +336,15 @@ export const acceptBooking = async (req, res) => {
         $set: {
           status:
             ride.availableSeats - seatsToBook <= 0 ? "booked" : ride.status,
+        },
+        $push: {
+          passengers: {
+            name: booking.passenger.name,
+            phone: booking.passenger.phone,
+            email: booking.passenger.email,
+            seatsBooked: booking.seatsBooked,
+            picture: booking.passenger.picture,
+          },
         },
       },
       { new: true }
@@ -410,7 +428,7 @@ export const getRide = async (req, res) => {
     const { rideId } = req.params;
     const { uid } = req.user;
 
-    const ride = await rideModel.findById(rideId);
+    const ride = await rideModel.findById(rideId).populate("driver");
 
     if (!ride) {
       return res.status(404).json({ success: false, error: "Ride not found" });
@@ -426,5 +444,88 @@ export const getRide = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({ success: false, error: "Server Side Error" });
+  }
+};
+
+export const completeRide = async (req, res) => {
+  try {
+    const { rideId } = req.params;
+
+    const { uid } = req.user;
+
+    const user = await userModel.findOne({ uid });
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, error: "User not found or unauthorized." });
+    }
+
+    const ride = await rideModel.findById(rideId);
+    if (!ride) {
+      return res.status(404).json({ success: false, error: "Ride not found." });
+    }
+
+    if (ride.driver.toString() !== user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        error: "Unauthorized: Only the ride driver can complete this trip.",
+      });
+    }
+
+    if (ride.status !== "ongoing") {
+      return res.status(400).json({
+        success: false,
+        error: `Cannot complete ride. Current status is '${ride.status}'.`,
+      });
+    }
+
+    ride.status = "completed";
+    await ride.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Ride successfully completed.",
+      ride: ride,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, error: "Server Side Error" });
+  }
+};
+
+export const startRide = async (req, res) => {
+  const { rideId } = req.params;
+  const driverId = req.user.uid;
+
+  try {
+    const ride = await rideModel.findById(rideId).populate("driver");
+
+    if (!ride) {
+      return res.status(404).json({ message: "Ride not found" });
+    }
+
+    if (ride.driver.uid.toString() !== driverId) {
+      return res.status(403).json({
+        message: "Unauthorized: Only the assigned driver can start this ride",
+      });
+    }
+
+    if (ride.status !== "booked") {
+      return res.status(400).json({
+        message: `Cannot start ride. Current status is ${ride.status}.`,
+      });
+    }
+
+    ride.status = "ongoing";
+    await ride.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Ride started successfully",
+      rideStatus: ride.status,
+    });
+  } catch (error) {
+    console.error("Error starting ride:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };

@@ -15,7 +15,6 @@ import { Car } from "lucide-react";
 import { useState } from "react";
 import {
   signInWithPopup,
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
@@ -32,7 +31,9 @@ export default function SignUpPage() {
   const [isSignup, setIsSignup] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [imgURL, setImgURL] = useState("https://res.cloudinary.com/dxvqusbka/image/upload/v1741281942/Person_yxz6w1.png");
+  const [imgURL, setImgURL] = useState(
+    "https://res.cloudinary.com/dxvqusbka/image/upload/v1741281942/Person_yxz6w1.png"
+  );
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
@@ -53,16 +54,23 @@ export default function SignUpPage() {
         throw new Error("Failed to authenticate with server");
       }
 
+      const userFromServer = await response.json();
+
       useAuthStore.setState({
         user: {
-          uid: result.user.uid,
-          email: result.user.email,
-          displayName: result.user.displayName,
-          photoURL: result.user.photoURL || "/icons/person2.png",
+          uid: userFromServer.uid,
+          email: userFromServer.email,
+          displayName: userFromServer.name,
+          photoURL: userFromServer.picture,
+          phone: userFromServer.phone,
         },
       });
 
-      router.push('/');
+      if (!userFromServer.phone) {
+        router.push("/verify-phone");
+      } else {
+        router.push("/");
+      }
     } catch (error: any) {
       console.error("Error during sign-in:", error);
       setError(error.message || "Failed to sign in with Google");
@@ -83,31 +91,25 @@ export default function SignUpPage() {
     }
 
     try {
-      console.log("Registering with:", email, password);
-
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email.trim(),
         password
       );
+
       const user = userCredential.user;
 
+      // Update profile with name + photo
       await updateProfile(user, {
         displayName: name,
         photoURL: imgURL,
       });
 
-      useAuthStore.setState({
-        user: {
-          uid: user.uid,
-          email: user.email,
-          displayName: name,
-          photoURL: imgURL,
-        },
-      });
-
+      // Get Firebase token
       const token = await user.getIdToken();
-      const response = await fetch("http://localhost:8000/api/protected", {
+
+      // Send to backend so user gets created in MongoDB
+      const response = await fetch("http://localhost:8000/api/user", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -115,14 +117,36 @@ export default function SignUpPage() {
         },
         body: JSON.stringify({ name }),
       });
+
       if (!response.ok) {
         throw new Error("Failed to authenticate with server");
       }
-      router.push('/dashboard');
+
+      // ⭐ Get user from backend (includes phone)
+      const userFromServer = await response.json();
+
+      // ⭐ Store user in Zustand
+      useAuthStore.setState({
+        user: {
+          uid: userFromServer.uid,
+          email: userFromServer.email,
+          displayName: userFromServer.name,
+          photoURL: userFromServer.picture,
+          phone: userFromServer.phone,
+        },
+      });
+
+      // ⭐ If phone is missing → redirect to OTP verify
+      if (!userFromServer.phone) {
+        router.push("/verify-phone");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (error) {
       console.error("Registration Error:", error);
     }
   };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setEmail("");
@@ -141,7 +165,9 @@ export default function SignUpPage() {
             {isSignup ? "Welcome back!" : "Create an account"}
           </CardTitle>
           <CardDescription>
-            {isSignup ? "Enter your credentials to log in" : "Enter your details to create an account"}
+            {isSignup
+              ? "Enter your credentials to log in"
+              : "Enter your details to create an account"}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -150,7 +176,7 @@ export default function SignUpPage() {
               {error}
             </div>
           )}
-          
+
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isSignup && (
               <div className="space-y-2">
@@ -176,7 +202,7 @@ export default function SignUpPage() {
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -189,22 +215,40 @@ export default function SignUpPage() {
               />
             </div>
 
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full"
               disabled={isLoading}
               onClick={handleRegister}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   Processing...
                 </div>
+              ) : isSignup ? (
+                "Sign in"
               ) : (
-                isSignup ? "Sign in" : "Create account"
+                "Create account"
               )}
             </Button>
 

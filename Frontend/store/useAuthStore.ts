@@ -9,6 +9,7 @@ interface AuthState {
     email: string | null;
     displayName: string | null;
     photoURL: string | null;
+    phone: string | null;
   } | null;
   setUser: (user: AuthState["user"]) => void;
 }
@@ -21,19 +22,20 @@ const useAuthStore = create<AuthState>()(
     }),
     {
       name: "auth-storage",
-    } as PersistOptions<AuthState> 
+    } as PersistOptions<AuthState>
   )
 );
 
 auth.onAuthStateChanged(async (currentUser: User | null) => {
   if (currentUser) {
-    await currentUser.reload(); 
+    await currentUser.reload();
 
     const user: AuthState["user"] = {
       uid: currentUser.uid,
       email: currentUser.email,
       displayName: currentUser.displayName,
-      photoURL: currentUser.photoURL, 
+      photoURL: currentUser.photoURL,
+      phone: currentUser.phoneNumber,
     };
 
     useAuthStore.setState({ user });
